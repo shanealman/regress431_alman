@@ -370,64 +370,84 @@ summary {
 <div id="linear-regression" class="section level2">
 <h2>Linear Regression</h2>
 <pre class="r"><code>simple_linear_regression</code></pre>
-<pre><code>## function(dat, response, explanatory){
-## 
-##   x &lt;- dat %&gt;% pull({{explanatory}})
-##   y &lt;- dat %&gt;% pull({{response}})
-## 
-##   explan_name &lt;- data %&gt;%
-##     select({{explanatory}}) %&gt;%
-##     names()
-## 
-##   x_bar &lt;- mean(x)
-##   y_bar &lt;- mean(y)
-## 
-##   ### Edit code after here
-## 
-##   sd_x &lt;- 1
-##   sd_y &lt;- 1
-## 
-##   beta_0 &lt;- 1
-##   beta_1 &lt;- 1
-## 
-##   ### Stop editing
-## 
-##   results &lt;- tibble::tibble(
-##     Intercept = beta_0,
-##     Slope = beta_1
-##   )
-## 
-##   names(results)[2] &lt;- explan_name
-## 
-##   return(results)
-## 
+<pre><code>## function (dat, response, explanatory) 
+## {
+##     x &lt;- dat %&gt;% pull({
+##         {
+##             explanatory
+##         }
+##     })
+##     y &lt;- dat %&gt;% pull({
+##         {
+##             response
+##         }
+##     })
+##     explan_name &lt;- dat %&gt;% select({
+##         {
+##             explanatory
+##         }
+##     }) %&gt;% names()
+##     x_bar &lt;- mean(x)
+##     y_bar &lt;- mean(y)
+##     sd_x &lt;- sqrt((sum(x - x_bar)^2)/length(x))
+##     sd_y &lt;- sqrt((sum(y - y_bar)^2)/length(y))
+##     x &lt;- cbind(1, x)
+##     A &lt;- solve(t(x) %*% x) %*% t(x) %*% y
+##     beta_0 &lt;- A[1]
+##     beta_1 &lt;- A[2]
+##     results &lt;- tibble::tibble(Intercept = beta_0, Slope = beta_1)
+##     names(results)[2] &lt;- explan_name
+##     return(results)
 ## }
-## &lt;bytecode: 0x000000000c3644c8&gt;
+## &lt;bytecode: 0x00000000180f4930&gt;
 ## &lt;environment: namespace:regress431&gt;</code></pre>
 <pre class="r"><code>multiple_linear_regression</code></pre>
-<pre><code>## function(dat, response) {
-## 
-## 
-## 
-##   results &lt;- 0 ### This should be a data frame, with columns named
-##                 ### &quot;Intercept&quot; and the same variable names as dat.
-## 
-##   return(results)
-## 
+<pre><code>## function (dat, response) 
+## {
+##     dt &lt;- data.table(dat)
+##     y &lt;- dt %&gt;% pull({
+##         {
+##             response
+##         }
+##     })
+##     x &lt;- dt %&gt;% select(-{
+##         {
+##             response
+##         }
+##     })
+##     x &lt;- cbind(1, x)
+##     x &lt;- as.matrix(x)
+##     A &lt;- solve(t(x) %*% x) %*% t(x) %*% y
+##     rownames(A)[1] = &quot;Intercpet&quot;
+##     results &lt;- data.table(t(A))
+##     return(results)
 ## }
-## &lt;bytecode: 0x000000000c4085e0&gt;
+## &lt;bytecode: 0x00000000181770e0&gt;
 ## &lt;environment: namespace:regress431&gt;</code></pre>
 </div>
 <div id="predict" class="section level2">
 <h2>Predict</h2>
 <pre class="r"><code>predict_from_coefs</code></pre>
-<pre><code>## function(dat, response, coefs){
-## 
-## 
-## 
-## 
+<pre><code>## function (dat, response, coefs) 
+## {
+##     dt &lt;- data.table(dat)
+##     y &lt;- dt %&gt;% pull({
+##         {
+##             response
+##         }
+##     })
+##     x &lt;- dt %&gt;% select(-{
+##         {
+##             response
+##         }
+##     })
+##     x &lt;- cbind(1, x)
+##     x &lt;- as.matrix(x)
+##     predictions &lt;- x %*% t(coefs)
+##     results &lt;- data.frame(True_Values = y, Predicted_Values = predictions)
+##     return(results)
 ## }
-## &lt;bytecode: 0x000000000c562080&gt;
+## &lt;bytecode: 0x00000000182cc278&gt;
 ## &lt;environment: namespace:regress431&gt;</code></pre>
 </div>
 
