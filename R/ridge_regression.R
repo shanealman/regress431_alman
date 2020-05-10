@@ -19,10 +19,10 @@
 #' @export
 #'
 ridge_regression <- function(dat, response, lambda) {
-
   dat <- scale(dat)
 
   dt <- data.table(dat)
+
   y <- dt %>%  pull({{response}})
   x <- dt %>% select(-{{response}})
 
@@ -35,14 +35,14 @@ ridge_regression <- function(dat, response, lambda) {
   A <- lapply(lambda, betas)
   A <- Reduce(function(...) merge(..., all = T), A)
 
-  rownames(A)[1] <- 'Intercpet'
+  colnames(A)[[1]] = 'Intercept'
 
-  A <- cbind(lambda, z)
+  A <- cbind(A, lambda)
 
-  results <- data.table(t(A))
+  results <- data.table(A)
 
 
-  return(A)
+  return(results)
 
 }
 
@@ -61,15 +61,24 @@ ridge_regression <- function(dat, response, lambda) {
 #' @return A data frame of penalty terms and resulting errors
 #'
 #' @import dplyr
+#' @import data.table
 #'
 #' @export
 find_best_lambda <- function(train_dat, test_dat, response, lambdas) {
 
+  train_betas <- ridge_regression(train_dat, {{response}}, lambdas)
 
-  ### lambda_errors should be a data frame with two columns: "lambda" and "error"
-  ### For each lambda, you should record the resulting Sum of Squared error
-  ### (i.e., the predicted value minus the real value squared) from prediction
-  ### on the test dataset.
+  test_dat <- scale(test_dat)
+
+  fits <- test_dat %*% head(t(train_betas), -1)
+
+  test_dat <- data.table(test_dat)
+
+  y <- test_dat %>% pull({{response}})
+
+  sse <- colSums((y - fits)^2)
+
+  lambda_errors <- cbind(sse = sse, lambdas = rev(lambdas))
 
   return(lambda_errors)
 }
