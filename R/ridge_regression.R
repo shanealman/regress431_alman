@@ -17,6 +17,7 @@
 #' @import data.table
 #'
 #' @export
+#'
 ridge_regression <- function(dat, response, lambda) {
 
   dat <- scale(dat)
