@@ -1,4 +1,3 @@
-
 test_that("simple linear regression is correct", {
 
   my_result <- mtcars %>%

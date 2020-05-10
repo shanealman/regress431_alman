@@ -14,18 +14,34 @@
 #' @return A data frame of coefficients
 #'
 #' @import dplyr
+#' @import data.table
 #'
 #' @export
 ridge_regression <- function(dat, response, lambda) {
 
+  dat <- scale(dat)
+
+  dt <- data.table(dat)
+  y <- dt %>%  pull({{response}})
+  x <- dt %>% select(-{{response}})
+
+  x <- cbind(1, x)
+  x <- as.matrix(x)
+
+  betas <- function(lambda){A <- t(solve(t(x) %*% x + lambda * diag(ncol(x)), t(x) %*% y))
+  return(A)}
+
+  A <- lapply(lambda, betas)
+  A <- Reduce(function(...) merge(..., all = T), A)
+
+  rownames(A)[1] <- 'Intercpet'
+
+  A <- cbind(lambda, z)
+
+  results <- data.table(t(A))
 
 
-  results <- 0
-  ### This should be a data frame, with columns named
-  ### "Intercept" and the same variable names as dat, and also a column
-  ### called "lambda".
-
-  return(results)
+  return(A)
 
 }
 

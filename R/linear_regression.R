@@ -7,6 +7,7 @@
 #' @return A data frame of coefficients
 #'
 #' @import dplyr
+#' @import data.table
 #'
 #' @export
 simple_linear_regression <- function(dat, response, explanatory){
@@ -75,7 +76,7 @@ multiple_linear_regression <- function(dat, response) {
 
   A <- solve(t(x) %*% x) %*% t(x) %*% y
 
-  rownames(A)[1] = 'Intercpet'
+  rownames(A)[1] <- 'Intercpet'
 
   results <- data.table(t(A))
 
